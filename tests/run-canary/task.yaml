@@ -1,0 +1,25 @@
+# SPDX-License-Identifier: Apache-2.0
+# SPDX-FileCopyrightText: Zygmunt Krynicki
+summary: plz-run -same-dir preserves the current working directory
+artifacts:
+  - submission.json
+  - submission.html
+  - submission.txt
+execute: |
+  . /etc/os-release
+  CHECKBOX=checkbox`echo $VERSION | grep -P --only-matching "^\d{2}"`
+  echo "Testing $CHECKBOX"
+  snap download --edge $CHECKBOX
+  unsquashfs $CHECKBOX*.snap
+  for p in `find squashfs-root -name "checkbox_ng"`; do
+    cp -rT ../../checkbox/checkbox-ng/checkbox_ng $p;
+  done
+  for p in `find squashfs-root -name "plainbox"`; do
+    cp -rT ../../checkbox/checkbox-ng/plainbox $p;
+  done
+  for p in `find squashfs-root -name "checkbox_support"`; do
+    cp -rT ../../checkbox/checkbox-support/checkbox_support $p;
+  done
+  snap try --devmode squashfs-root/
+  snap start $CHECKBOX
+  $CHECKBOX.checkbox control 127.0.0.1 launcher.conf
