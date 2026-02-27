@@ -1,6 +1,6 @@
-# SPDX-License-Identifier: Apache-2.0
-# SPDX-FileCopyrightText: Zygmunt Krynicki
-summary: plz-run -same-dir preserves the current working directory
+# SPDX-License-Identifier: GPLv3
+# SPDX-FileCopyrightText: Massimiliano Girardi
+summary: Run checkbox canary by patching either local snap or downloaded
 artifacts:
   - submission.json
   - submission.html
@@ -9,17 +9,29 @@ execute: |
   . /etc/os-release
   CHECKBOX=checkbox`echo $VERSION | grep -P --only-matching "^\d{2}"`
   echo "Testing $CHECKBOX"
-  snap download --edge $CHECKBOX
+  if ls ../../$CHECKBOX*.snap 1>/dev/null 2>&1; then
+    echo "Using local checkbox snap"
+    cp ../../checkbox*.snap .
+  else
+    snap download --edge $CHECKBOX
+  fi
   unsquashfs $CHECKBOX*.snap
-  for p in `find squashfs-root -name "checkbox_ng"`; do
-    cp -rT ../../checkbox/checkbox-ng/checkbox_ng $p;
-  done
-  for p in `find squashfs-root -name "plainbox"`; do
-    cp -rT ../../checkbox/checkbox-ng/plainbox $p;
-  done
-  for p in `find squashfs-root -name "checkbox_support"`; do
-    cp -rT ../../checkbox/checkbox-support/checkbox_support $p;
-  done
+  if ls ../../checkbox 1>/dev/null 2>&1; then
+    for p in `find squashfs-root -name "checkbox_ng"`; do
+      rm -rf $p;
+      cp -rT ../../checkbox/checkbox-ng/checkbox_ng $p;
+    done
+    for p in `find squashfs-root -name "plainbox"`; do
+      rm -rf $p;
+      cp -rT ../../checkbox/checkbox-ng/plainbox $p;
+    done
+    for p in `find squashfs-root -name "checkbox_support"`; do
+      rm -rf $p;
+      cp -rT ../../checkbox/checkbox-support/checkbox_support $p;
+    done
+  else
+    echo "Skipping patching the snap"
+  fi
   snap try --devmode squashfs-root/
   snap start $CHECKBOX
   $CHECKBOX.checkbox control 127.0.0.1 launcher.conf

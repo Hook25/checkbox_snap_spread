@@ -1,0 +1,6 @@
+checkbox/
+checkbox*.snap
+artifacts/
+.spread*
+ubuntu-*
+efi-*
