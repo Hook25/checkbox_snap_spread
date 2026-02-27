@@ -4,7 +4,8 @@ This is an experiment that aims to provide a convenient way to test Checkbox
 
 ## Preparation
 
-This repo uses image garden, to install image garden refer to this guide:
+This repo uses image garden, to install image garden refer to this 
+[guide (link)](https://gitlab.com/zygoon/image-garden#installing-snap-package)
 
 ## Basic usage
 
